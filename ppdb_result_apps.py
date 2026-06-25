@@ -214,7 +214,7 @@ if uploaded_file:
         "Jumlah Jurusan"
     ]
 
-    st.subheader("Jumlah Sekolah Terhadap Jurusan")
+    st.subheader("Jumlah Jurusan Terhadap Sekolah")
 
     st.dataframe(
         loyal.sort_values(
@@ -296,7 +296,7 @@ if uploaded_file:
     excel_data = output.getvalue()
 
     st.download_button(
-        label="📥 Download Excel Analisis",
+        label="Download Analisis Excel",
         data=excel_data,
         file_name="Analisis_PPDB_SMKN4.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -309,7 +309,7 @@ if uploaded_file:
     csv = sekolah.to_csv(index=False)
 
     st.download_button(
-        label="📥 Download Ranking Sekolah (CSV)",
+        label="Download Ranking Sekolah (CSV)",
         data=csv,
         file_name="ranking_sekolah.csv",
         mime="text/csv"
@@ -398,7 +398,7 @@ if uploaded_file:
     pdf_bytes = pdf_buffer.getvalue()
 
     st.download_button(
-        label="📄 Download Laporan PDF",
+        label="Download Laporan PDF",
         data=pdf_bytes,
         file_name="Laporan_PPDB_SMKN4.pdf",
         mime="application/pdf"
