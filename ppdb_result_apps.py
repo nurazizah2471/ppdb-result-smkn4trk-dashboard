@@ -7,8 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1sY1IeruhFeD-zuDbHtAglAhq_PcgA8tV
 """
 
-pip install streamlit pandas plotly openpyxl
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -134,176 +132,176 @@ if uploaded_file:
         """
     )
 
-ranking = (
-    df.groupby(
-        ["Kompetensi Keahlian",
-         "Asal Sekolah"]
+    ranking = (
+        df.groupby(
+            ["Kompetensi Keahlian",
+            "Asal Sekolah"]
+        )
+        .size()
+        .reset_index(name="Jumlah")
     )
-    .size()
-    .reset_index(name="Jumlah")
-)
 
-st.subheader("Ranking Sekolah per Jurusan")
+    st.subheader("Ranking Sekolah per Jurusan")
 
-jurusan_pilih = st.selectbox(
-    "Pilih Jurusan",
-    sorted(df["Kompetensi Keahlian"].unique())
-)
+    jurusan_pilih = st.selectbox(
+        "Pilih Jurusan",
+        sorted(df["Kompetensi Keahlian"].unique())
+    )
 
-hasil = (
-    ranking[
-        ranking["Kompetensi Keahlian"]
-        == jurusan_pilih
+    hasil = (
+        ranking[
+            ranking["Kompetensi Keahlian"]
+            == jurusan_pilih
+        ]
+        .sort_values(
+            "Jumlah",
+            ascending=False
+        )
+    )
+
+    st.dataframe(hasil)
+
+    fig = px.bar(
+        hasil.head(10),
+        x="Asal Sekolah",
+        y="Jumlah",
+        title=f"Top Sekolah Jurusan {jurusan_pilih}"
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+
+    import plotly.express as px
+
+    pivot = pd.pivot_table(
+        df,
+        index="Asal Sekolah",
+        columns="Kompetensi Keahlian",
+        aggfunc="size",
+        fill_value=0
+    )
+
+    fig = px.imshow(
+        pivot,
+        text_auto=True,
+        aspect="auto",
+        title="Heatmap Sekolah vs Jurusan"
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+
+    loyal = (
+        df.groupby("Asal Sekolah")
+        ["Kompetensi Keahlian"]
+        .nunique()
+        .reset_index()
+    )
+
+    loyal.columns = [
+        "Sekolah",
+        "Jumlah Jurusan"
     ]
-    .sort_values(
-        "Jumlah",
-        ascending=False
-    )
-)
 
-st.dataframe(hasil)
+    st.subheader("Sekolah Loyal")
 
-fig = px.bar(
-    hasil.head(10),
-    x="Asal Sekolah",
-    y="Jumlah",
-    title=f"Top Sekolah Jurusan {jurusan_pilih}"
-)
-
-st.plotly_chart(
-    fig,
-    use_container_width=True
-)
-
-import plotly.express as px
-
-pivot = pd.pivot_table(
-    df,
-    index="Asal Sekolah",
-    columns="Kompetensi Keahlian",
-    aggfunc="size",
-    fill_value=0
-)
-
-fig = px.imshow(
-    pivot,
-    text_auto=True,
-    aspect="auto",
-    title="Heatmap Sekolah vs Jurusan"
-)
-
-st.plotly_chart(
-    fig,
-    use_container_width=True
-)
-
-loyal = (
-    df.groupby("Asal Sekolah")
-      ["Kompetensi Keahlian"]
-      .nunique()
-      .reset_index()
-)
-
-loyal.columns = [
-    "Sekolah",
-    "Jumlah Jurusan"
-]
-
-st.subheader("Sekolah Loyal")
-
-st.dataframe(
-    loyal.sort_values(
-        "Jumlah Jurusan",
-        ascending=False
-    )
-)
-
-top_school = (
-    df["Asal Sekolah"]
-    .value_counts()
-    .idxmax()
-)
-
-jumlah_top = (
-    df["Asal Sekolah"]
-    .value_counts()
-    .max()
-)
-
-top_jurusan = (
-    df["Kompetensi Keahlian"]
-    .value_counts()
-    .idxmax()
-)
-
-st.info(
-f"""
-🏆 Sekolah penyumbang terbesar:
-{top_school} ({jumlah_top} siswa)
-
-🎯 Jurusan paling diminati:
-{top_jurusan}
-
-📈 Sekolah tersebut menjadi target utama promosi PPDB tahun berikutnya.
-"""
-)
-
-from io import BytesIO
-
-output = BytesIO()
-
-with pd.ExcelWriter(output, engine="openpyxl") as writer:
-
-    df.to_excel(
-        writer,
-        sheet_name="Data Asli",
-        index=False
+    st.dataframe(
+        loyal.sort_values(
+            "Jumlah Jurusan",
+            ascending=False
+        )
     )
 
-    sekolah.to_excel(
-        writer,
-        sheet_name="Ranking Sekolah",
-        index=False
+    top_school = (
+        df["Asal Sekolah"]
+        .value_counts()
+        .idxmax()
     )
 
-    jurusan.to_excel(
-        writer,
-        sheet_name="Ranking Jurusan",
-        index=False
+    jumlah_top = (
+        df["Asal Sekolah"]
+        .value_counts()
+        .max()
     )
 
-    ranking.to_excel(
-        writer,
-        sheet_name="Sekolah per Jurusan",
-        index=False
+    top_jurusan = (
+        df["Kompetensi Keahlian"]
+        .value_counts()
+        .idxmax()
     )
 
-    pivot.to_excel(
-        writer,
-        sheet_name="Heatmap"
+    st.info(
+    f"""
+    🏆 Sekolah penyumbang terbesar:
+    {top_school} ({jumlah_top} siswa)
+
+    🎯 Jurusan paling diminati:
+    {top_jurusan}
+
+    📈 Sekolah tersebut menjadi target utama promosi PPDB tahun berikutnya.
+    """
     )
 
-excel_data = output.getvalue()
+    from io import BytesIO
 
-st.download_button(
-    label="📥 Download Excel Analisis",
-    data=excel_data,
-    file_name="Analisis_PPDB_SMKN4.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
+    output = BytesIO()
 
-csv = sekolah.to_csv(index=False)
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
 
-st.download_button(
-    "📥 Download Ranking Sekolah",
-    csv,
-    "ranking_sekolah.csv",
-    "text/csv"
-)
+        df.to_excel(
+            writer,
+            sheet_name="Data Asli",
+            index=False
+        )
 
-st.download_button(
-    "📄 Download PDF",
-    pdf_bytes,
-    "Laporan_PPDB.pdf",
-    "application/pdf"
-)
+        sekolah.to_excel(
+            writer,
+            sheet_name="Ranking Sekolah",
+            index=False
+        )
+
+        jurusan.to_excel(
+            writer,
+            sheet_name="Ranking Jurusan",
+            index=False
+        )
+
+        ranking.to_excel(
+            writer,
+            sheet_name="Sekolah per Jurusan",
+            index=False
+        )
+
+        pivot.to_excel(
+            writer,
+            sheet_name="Heatmap"
+        )
+
+    excel_data = output.getvalue()
+
+    st.download_button(
+        label="📥 Download Excel Analisis",
+        data=excel_data,
+        file_name="Analisis_PPDB_SMKN4.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+    csv = sekolah.to_csv(index=False)
+
+    st.download_button(
+        "📥 Download Ranking Sekolah",
+        csv,
+        "ranking_sekolah.csv",
+        "text/csv"
+    )
+
+    st.download_button(
+        "📄 Download PDF",
+        pdf_bytes,
+        "Laporan_PPDB.pdf",
+        "application/pdf"
+    )
