@@ -154,7 +154,7 @@ if uploaded_file:
         .reset_index(name="Jumlah Murid")
     )
 
-    st.subheader("Ranking Sekolah per Jurusan")
+    st.subheader("Ranking Asal Sekolah per Jurusan")
 
     jurusan_pilih = st.selectbox(
         "Pilih Jurusan",
@@ -181,7 +181,7 @@ if uploaded_file:
         hasil.head(10),
         x="Asal Sekolah",
         y="Jumlah Murid",
-        title=f"Top Sekolah Jurusan {jurusan_pilih}"
+        title=f"Top Asal Sekolah Jurusan {jurusan_pilih}"
     )
 
     st.plotly_chart(
@@ -341,10 +341,10 @@ if uploaded_file:
 
     if len(sekolah) >= 5:
 
-        batas = sekolah.iloc[4]["Jumlah"]
+        batas = sekolah.iloc[4]["Jumlah Murid"]
 
         top5_sekolah = sekolah[
-            sekolah["Jumlah"] >= batas
+            sekolah["Jumlah Murid"] >= batas
         ]
 
     else:
