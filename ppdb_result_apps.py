@@ -12,7 +12,7 @@ import pandas as pd
 import plotly.express as px
 
 st.set_page_config(
-    page_title="Dashboard PPDB SMKN 4 Tarakan",
+    page_title="Dashboard PPDB SMKN 4 Tarakan 2026",
     layout="wide"
 )
 
@@ -117,22 +117,35 @@ if uploaded_file:
     # Insight
     # ======================
 
-    top_school = sekolah.iloc[0]
-
-    top_major = (
-        df["Kompetensi Keahlian"]
+    school_count = (
+        df["Asal Sekolah"]
         .value_counts()
-        .idxmax()
     )
 
+    jumlah_top = school_count.max()
+
+    top_school_list = (
+        school_count[
+            school_count == jumlah_top
+        ]
+        .index
+        .tolist()
+    )
+
+    if len(top_school_list) == 1:
+        top_school_text = top_school_list[0]
+    else:
+        top_school_text = ", ".join(top_school_list[:-1])
+        top_school_text += f" dan {top_school_list[-1]}"
+    
     st.success(
         f"""
         Sekolah penyumbang terbesar adalah
-        {top_school['Sekolah']}
-        dengan {top_school['Jumlah']} siswa.
+        {top_school_text}
+        dengan {jumlah_top} siswa.
 
-        Jurusan paling diminati adalah
-        {top_major}.
+        Detail jurusan dengan peminat tertinggi
+        akan ditampilkan pada bagian insight.
         """
     )
 
@@ -158,8 +171,8 @@ if uploaded_file:
             == jurusan_pilih
         ]
         .sort_values(
-            "Jumlah",
-            ascending=False
+            ["Jumlah", "Asal Sekolah"],
+            ascending=[False, True]
         )
     )
 
@@ -224,32 +237,37 @@ if uploaded_file:
         hide_index=True
     )
 
-    top_school = (
-        df["Asal Sekolah"]
-        .value_counts()
-        .idxmax()
-    )
-
-    jumlah_top = (
-        df["Asal Sekolah"]
-        .value_counts()
-        .max()
-    )
-
-    top_jurusan = (
+    jurusan_count = (
         df["Kompetensi Keahlian"]
         .value_counts()
-        .idxmax()
     )
 
-    st.info(
-    f"""
-    Sekolah penyumbang terbesar:
-    {top_school} ({jumlah_top} siswa)
+    max_peminat = jurusan_count.max()
 
-    Jurusan paling diminati:
-    {top_jurusan}
-    """
+    top_jurusan_list = (
+        jurusan_count[
+            jurusan_count == max_peminat
+        ]
+        .index
+        .tolist()
+    )
+
+    if len(top_jurusan_list) == 1:
+        top_jurusan = top_jurusan_list[0]
+    else:
+        top_jurusan = ", ".join(top_jurusan_list[:-1])
+        top_jurusan += f" dan {top_jurusan_list[-1]}"
+
+    st.info(
+        f"""
+        Sekolah penyumbang terbesar:
+        {top_school_text}
+        ({jumlah_top} siswa)
+
+        Jurusan dengan peminat tertinggi:
+        {top_jurusan}
+        ({max_peminat} siswa)
+        """
     )
 
     from io import BytesIO
@@ -325,7 +343,17 @@ if uploaded_file:
 
     styles = getSampleStyleSheet()
 
-    top5_sekolah = sekolah.head(5)
+    if len(sekolah) >= 5:
+
+        batas = sekolah.iloc[4]["Jumlah"]
+
+        top5_sekolah = sekolah[
+            sekolah["Jumlah"] >= batas
+        ]
+
+    else:
+
+        top5_sekolah = sekolah
 
     content = []
 
@@ -354,14 +382,14 @@ if uploaded_file:
 
     content.append(
         Paragraph(
-            f"Jurusan Terpopuler: {top_jurusan}",
+            f"Jurusan Dengan Peminat Tertinggi: {top_jurusan} ({max_peminat} siswa)",
             styles["Normal"]
         )
     )
 
     content.append(
         Paragraph(
-            f"Sekolah Penyumbang Terbesar: {top_school} ({jumlah_top} siswa)",
+            f"Sekolah Penyumbang Terbesar: {top_school_text} ({jumlah_top} siswa)",
             styles["Normal"]
         )
     )
