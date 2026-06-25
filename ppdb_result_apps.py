@@ -403,7 +403,7 @@ if uploaded_file:
 
         content.append(
             Paragraph(
-                f"{row['Sekolah']} : {row['Jumlah']} murid",
+                f"{row['Sekolah']} : {row['Jumlah Murid']} murid",
                 styles["Normal"]
             )
         )
