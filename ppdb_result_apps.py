@@ -19,7 +19,7 @@ st.set_page_config(
 st.title("Dashboard Analisis SPMB SMKN 4 Tarakan")
 
 uploaded_file = st.file_uploader(
-    "Upload File Excel",
+    "Upload File Excel Hasil SPMB",
     type=["xlsx"]
 )
 
@@ -58,12 +58,12 @@ if uploaded_file:
         .reset_index()
     )
 
-    jurusan.columns = ["Jurusan", "Jumlah"]
+    jurusan.columns = ["Jurusan", "Jumlah Murid"]
 
     fig = px.pie(
         jurusan,
         names="Jurusan",
-        values="Jumlah",
+        values="Jumlah Murid",
         title="Distribusi Jurusan"
     )
 
@@ -79,12 +79,12 @@ if uploaded_file:
         .reset_index()
     )
 
-    sekolah.columns = ["Sekolah", "Jumlah"]
+    sekolah.columns = ["Sekolah", "Jumlah Murid"]
 
     fig2 = px.bar(
         sekolah.head(10),
         x="Sekolah",
-        y="Jumlah",
+        y="Jumlah Murid",
         title="Top 10 Asal Sekolah"
     )
 
@@ -104,7 +104,7 @@ if uploaded_file:
         else:
             return "Rendah"
 
-    sekolah["Kategori"] = sekolah["Jumlah"].apply(kategori)
+    sekolah["Kategori"] = sekolah["Jumlah Murid"].apply(kategori)
 
     st.subheader("Kategori Sekolah")
 
@@ -140,8 +140,6 @@ if uploaded_file:
     
     st.success(
         f"""
-        Kesimpulan Akhir
-
         Berdasarkan data hasil seleksi SPMB, sekolah asal dengan jumlah siswa diterima tertinggi adalah
         {top_school_text}, masing-masing berkontribusi sebanyak {jumlah_top} siswa.
         """
@@ -153,7 +151,7 @@ if uploaded_file:
             "Asal Sekolah"]
         )
         .size()
-        .reset_index(name="Jumlah")
+        .reset_index(name="Jumlah Murid")
     )
 
     st.subheader("Ranking Sekolah per Jurusan")
@@ -169,7 +167,7 @@ if uploaded_file:
             == jurusan_pilih
         ]
         .sort_values(
-            ["Jumlah", "Asal Sekolah"],
+            ["Jumlah Murid", "Asal Sekolah"],
             ascending=[False, True]
         )
     )
@@ -182,7 +180,7 @@ if uploaded_file:
     fig = px.bar(
         hasil.head(10),
         x="Asal Sekolah",
-        y="Jumlah",
+        y="Jumlah Murid",
         title=f"Top Sekolah Jurusan {jurusan_pilih}"
     )
 
@@ -205,7 +203,7 @@ if uploaded_file:
         pivot,
         text_auto=True,
         aspect="auto",
-        title="Heatmap Sekolah vs Jurusan"
+        title="Heatmap Asal Sekolah vs Jurusan"
     )
 
     st.plotly_chart(
@@ -225,7 +223,7 @@ if uploaded_file:
         "Jumlah Jurusan"
     ]
 
-    st.subheader("Jumlah Jurusan Terhadap Sekolah")
+    st.subheader("Jumlah Jurusan Terhadap Asal Sekolah")
 
     st.dataframe(
         loyal.sort_values(
@@ -264,7 +262,7 @@ if uploaded_file:
 
         Jurusan dengan peminat tertinggi:
         {top_jurusan}
-        ({max_peminat} siswa)
+        masing-masing berkontribusi sebanyak {max_peminat} siswa.
         """
     )
 
