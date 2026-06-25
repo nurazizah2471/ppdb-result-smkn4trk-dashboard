@@ -29,7 +29,10 @@ if uploaded_file:
 
     st.subheader("Data PPDB")
 
-    st.dataframe(df)
+    st.dataframe(
+        df,
+        hide_index=True
+    )
 
     # ======================
     # Statistik Dasar
@@ -105,7 +108,10 @@ if uploaded_file:
 
     st.subheader("Kategori Sekolah")
 
-    st.dataframe(sekolah)
+    st.dataframe(
+        sekolah,
+        hide_index=True
+    )
 
     # ======================
     # Insight
@@ -118,8 +124,6 @@ if uploaded_file:
         .value_counts()
         .idxmax()
     )
-
-    st.subheader("Insight Otomatis")
 
     st.success(
         f"""
@@ -159,7 +163,10 @@ if uploaded_file:
         )
     )
 
-    st.dataframe(hasil)
+    st.dataframe(
+        hasil,
+        hide_index=True
+    )
 
     fig = px.bar(
         hasil.head(10),
@@ -207,13 +214,14 @@ if uploaded_file:
         "Jumlah Jurusan"
     ]
 
-    st.subheader("Sekolah Loyal")
+    st.subheader("Jumlah Sekolah Terhadap Jurusan")
 
     st.dataframe(
         loyal.sort_values(
             "Jumlah Jurusan",
             ascending=False
-        )
+        ),
+        hide_index=True
     )
 
     top_school = (
@@ -236,17 +244,21 @@ if uploaded_file:
 
     st.info(
     f"""
-    🏆 Sekolah penyumbang terbesar:
+    Sekolah penyumbang terbesar:
     {top_school} ({jumlah_top} siswa)
 
-    🎯 Jurusan paling diminati:
+    Jurusan paling diminati:
     {top_jurusan}
-
-    📈 Sekolah tersebut menjadi target utama promosi PPDB tahun berikutnya.
     """
     )
 
     from io import BytesIO
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet
+
+    # =====================================
+    # DOWNLOAD EXCEL ANALISIS
+    # =====================================
 
     output = BytesIO()
 
@@ -290,18 +302,104 @@ if uploaded_file:
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
+    # =====================================
+    # DOWNLOAD CSV
+    # =====================================
+
     csv = sekolah.to_csv(index=False)
 
     st.download_button(
-        "📥 Download Ranking Sekolah",
-        csv,
-        "ranking_sekolah.csv",
-        "text/csv"
+        label="📥 Download Ranking Sekolah (CSV)",
+        data=csv,
+        file_name="ranking_sekolah.csv",
+        mime="text/csv"
     )
 
+    # =====================================
+    # DOWNLOAD PDF
+    # =====================================
+
+    pdf_buffer = BytesIO()
+
+    doc = SimpleDocTemplate(pdf_buffer)
+
+    styles = getSampleStyleSheet()
+
+    top5_sekolah = sekolah.head(5)
+
+    content = []
+
+    content.append(
+        Paragraph(
+            "LAPORAN ANALISIS PPDB SMKN 4 TARAKAN",
+            styles["Title"]
+        )
+    )
+
+    content.append(Spacer(1, 12))
+
+    content.append(
+        Paragraph(
+            f"Total Siswa Diterima: {total}",
+            styles["Normal"]
+        )
+    )
+
+    content.append(
+        Paragraph(
+            f"Jumlah Sekolah Asal: {df['Asal Sekolah'].nunique()}",
+            styles["Normal"]
+        )
+    )
+
+    content.append(
+        Paragraph(
+            f"Jurusan Terpopuler: {top_jurusan}",
+            styles["Normal"]
+        )
+    )
+
+    content.append(
+        Paragraph(
+            f"Sekolah Penyumbang Terbesar: {top_school} ({jumlah_top} siswa)",
+            styles["Normal"]
+        )
+    )
+
+    content.append(Spacer(1, 12))
+
+    content.append(
+        Paragraph(
+            "TOP 5 SEKOLAH PENYUMBANG SISWA",
+            styles["Heading2"]
+        )
+    )
+
+    for i, row in top5_sekolah.iterrows():
+
+        content.append(
+            Paragraph(
+                f"{row['Sekolah']} : {row['Jumlah']} siswa",
+                styles["Normal"]
+            )
+        )
+
+    content.append(Spacer(1, 12))
+
+    content.append(
+        Paragraph(
+            "Laporan dibuat otomatis dari Dashboard PPDB SMKN 4 Tarakan.",
+            styles["Italic"]
+        )
+    )
+
+    doc.build(content)
+
+    pdf_bytes = pdf_buffer.getvalue()
+
     st.download_button(
-        "📄 Download PDF",
-        pdf_bytes,
-        "Laporan_PPDB.pdf",
-        "application/pdf"
+        label="📄 Download Laporan PDF",
+        data=pdf_bytes,
+        file_name="Laporan_PPDB_SMKN4.pdf",
+        mime="application/pdf"
     )
