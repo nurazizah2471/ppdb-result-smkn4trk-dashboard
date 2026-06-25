@@ -42,7 +42,7 @@ if uploaded_file:
 
     col1, col2 = st.columns(2)
 
-    col1.metric("Total Siswa", total)
+    col1.metric("Total Murid", total)
     col2.metric(
         "Jumlah Sekolah Asal",
         df["Asal Sekolah"].nunique()
@@ -140,8 +140,8 @@ if uploaded_file:
     
     st.success(
         f"""
-        Berdasarkan data hasil seleksi SPMB, sekolah asal dengan jumlah siswa diterima tertinggi adalah
-        {top_school_text}, masing-masing berkontribusi sebanyak {jumlah_top} siswa.
+        Berdasarkan data hasil seleksi SPMB, sekolah asal dengan jumlah murid diterima tertinggi adalah
+        {top_school_text}, masing-masing berkontribusi sebanyak {jumlah_top} murid.
         """
     )
 
@@ -258,11 +258,11 @@ if uploaded_file:
         f"""
         Sekolah penyumbang terbesar:
         {top_school_text}
-        ({jumlah_top} siswa)
+        ({jumlah_top} murid)
 
         Jurusan dengan peminat tertinggi:
         {top_jurusan}
-        masing-masing berkontribusi sebanyak {max_peminat} siswa.
+        masing-masing berkontribusi sebanyak {max_peminat} murid.
         """
     )
 
@@ -364,7 +364,7 @@ if uploaded_file:
 
     content.append(
         Paragraph(
-            f"Total Siswa Diterima: {total}",
+            f"Total Murid Diterima: {total}",
             styles["Normal"]
         )
     )
@@ -378,14 +378,14 @@ if uploaded_file:
 
     content.append(
         Paragraph(
-            f"Jurusan Dengan Peminat Tertinggi: {top_jurusan} ({max_peminat} siswa)",
+            f"Jurusan Dengan Peminat Tertinggi: {top_jurusan} ({max_peminat} murid)",
             styles["Normal"]
         )
     )
 
     content.append(
         Paragraph(
-            f"Sekolah Penyumbang Terbesar: {top_school_text} ({jumlah_top} siswa)",
+            f"Sekolah Penyumbang Terbesar: {top_school_text} ({jumlah_top} murid)",
             styles["Normal"]
         )
     )
@@ -394,7 +394,7 @@ if uploaded_file:
 
     content.append(
         Paragraph(
-            "TOP 5 SEKOLAH PENYUMBANG SISWA",
+            "TOP 5 SEKOLAH PENYUMBANG MURID",
             styles["Heading2"]
         )
     )
@@ -403,7 +403,7 @@ if uploaded_file:
 
         content.append(
             Paragraph(
-                f"{row['Sekolah']} : {row['Jumlah']} siswa",
+                f"{row['Sekolah']} : {row['Jumlah']} murid",
                 styles["Normal"]
             )
         )
